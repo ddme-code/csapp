@@ -152,9 +152,7 @@ int bitXor(int x, int y) {
  *   Rating: 1
  */
 int tmin(void) {
-
-  return 1 << 32;
-
+  return 1 << 31;
 }
 //2
 /*
@@ -200,7 +198,12 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return !((x+(~0x30+1))>>3|0);   //maybe
+  int sign = 0x1<<31;
+  int upper = ~(sign|0x39);
+  int lower = ~0x30;
+  upper = sign&(upper+x)>>31;
+  lower = sign&(lower+1+x)>>31;
+  return !(upper|lower);
 }
 /* 
  * conditional - same as x ? y : z 
@@ -210,7 +213,7 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  int val=~(!!x)+1; //取bool值后若为0，则val为全0，否则全1
+  int val=(~0)+!x; //~(!!x)+1; 取bool值后若为0，则val为全0，否则全1
   return (val&y)|(~val&z);
 }
 /* 
