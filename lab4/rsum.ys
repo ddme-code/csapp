@@ -1,0 +1,47 @@
+#Execution begins at address
+    .pos 0
+    irmovq stack, %rsp
+    irmovq stack, %rbp
+    call main
+    halt
+
+    .align  4
+ele1:  
+    .long   0x00a
+    .long   ele2
+ele2:  
+    .long   0x0b0
+    .long   ele3
+ele3:   
+    .long   0xc00
+    .long   0
+
+main: 
+    push    %rbp        #提升栈空间
+    rrmovq  %rsp,%rbp
+    sub     %rsp,0x10
+    irmovq ele1, %rdi
+    call   sum_list
+    ret
+
+sum_list:
+    push    %rbp        #提升栈空间
+    rrmovq  %rsp,%rbp
+    sub     %rsp,0x10
+    xor     %rax,%rax
+    andq    %rdi,%rdi   #sat CC
+    jne     last
+    mrmovq  (%rdi),%rbx
+    pushq   %rbx
+    mrmovq  (%rdi+8),%rdi
+    call    sum_list
+    popq    %rbx
+    addq    %rbx,%rax
+    ret
+last:
+    irmovq  $0,%rax
+    ret
+
+#alloc stack space
+    .pos    0x1000
+stack:
