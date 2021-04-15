@@ -1,0 +1,54 @@
+#Execution begins at address
+    .pos 0
+    irmovq stack, %rsp
+    irmovq stack, %rbp
+    call main
+    halt
+
+.align 8
+# Source block
+src:
+    .quad 0x00a
+    .quad 0x0b0
+    .quad 0xc00
+# Destination block
+dest:
+    .quad 0x111
+    .quad 0x222
+    .quad 0x333
+
+main: 
+    push    %rbp        #提升栈空间
+    rrmovq  %rsp,%rbp
+    sub     %rsp,0x10
+    irmovq  src, %rdi
+    irmovq  dest,%rsi
+    irmovq  $3, %r8
+    call    copy_block
+    ret
+
+copy_block:
+    push    %rbp        #提升栈空间
+    rrmovq  %rsp,%rbp
+    sub     %rsp,0x10
+    xor     %rax,%rax
+    jmp     test
+    ret
+
+loop:
+    mrmovq  (%rsi),%rbx
+    mrmovq  (%rdi),%rcx
+    rmmovq  %rbx,(%rdi)
+    rmmovq  %rcx,(%rsi)
+    xorq    %rax,%rbx
+    mrmovq  8(%rdi),%rdi
+    mrmovq  8(%rsi),%rsi
+    subq    %r8,0x1
+test:
+    addq    %r8,%r8
+    jne     loop
+    ret
+
+#alloc stack space
+    .pos    0x1000
+stack:

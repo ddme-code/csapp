@@ -1,0 +1,156 @@
+#/* $begin ncopy-ys */
+##################################################################
+# ncopy.ys - Copy a src block of len words to dst.
+# Return the number of positive words (>0) contained in src.
+#
+# Include your name and ID here.
+#
+# Describe how and why you modified the baseline code.
+#
+##################################################################
+# Do not modify this portion
+# Function prologue.
+# %rdi = src, %rsi = dst, %rdx = len
+ncopy:
+
+##################################################################
+# You can modify this portion
+
+	xorq %rax,%rax
+	jmp StartLoop6
+Loop6:
+	mrmovq (%rdi),%r8
+	mrmovq 8(%rdi),%r9
+	rmmovq %r8,(%rsi)
+	rmmovq %r9,8(%rsi)
+	andq %r8,%r8
+	jle L61
+	iaddq $1,%rax
+L61:	
+	andq %r9,%r9
+	jle L62
+	iaddq $1,%rax
+L62:
+	mrmovq 16(%rdi),%r8
+	mrmovq 24(%rdi),%r9
+	rmmovq %r8,16(%rsi)
+	rmmovq %r9,24(%rsi)
+	andq %r8,%r8
+	jle L63
+	iaddq $1,%rax
+L63:	
+	andq %r9,%r9
+	jle L64
+	iaddq $1,%rax
+L64:
+	mrmovq 32(%rdi),%r8
+	mrmovq 40(%rdi),%r9
+	rmmovq %r8,32(%rsi)
+	rmmovq %r9,40(%rsi)
+	andq %r8,%r8
+	jle L65
+	iaddq $1,%rax
+L65:	
+	andq %r9,%r9
+	jle L66
+	iaddq $1,%rax
+L66:
+	iaddq $48,%rdi
+	iaddq $48,%rsi
+StartLoop6:
+	iaddq $-6,%rdx
+	jge Loop6
+	
+	iaddq $6,%rdx
+	jmp StartLoop2
+Loop2:
+	mrmovq (%rdi),%r8
+	mrmovq 8(%rdi),%r9
+	rmmovq %r8,(%rsi)
+	rmmovq %r9,8(%rsi)
+	andq %r8,%r8
+	jle L21
+	iaddq $1,%rax
+L21:	
+	andq %r9,%r9
+	jle L22
+	iaddq $1,%rax
+L22:
+	iaddq $16,%rdi
+	iaddq $16,%rsi
+StartLoop2:
+	iaddq $-2,%rdx
+	jge Loop2
+
+	mrmovq (%rdi),%rbx
+	iaddq $1,%rdx
+	jne Done
+	rmmovq %rbx,(%rsi)
+	andq %rbx,%rbx
+	jle Done
+	iaddq $1,%rax
+
+///////////////////////////////////////////
+以下是错误版本
+/////////////////////////////////////////
+	# Loop header
+        xorl    %rax , %rax  
+        jmp     Done
+Loop:   mrmovl  (%rdi) , %r8   #第一二个赋值
+        mrmovl  8(%rdi), %r9  #插在两指令之间防止冒险
+        rmmovl  %r8 ,   (%rsi) #移去第一个
+        andl    %r9,    %r9
+        jnle    Done
+        iaddl   $1 , %eax
+pos1: rmmovl  %r9  , 8(%rsi)  #移去第二个
+        andl    %rdx, %rdx
+        jnle    Done
+        iaddl   $1, %rax
+pos2: mrmovl  16(%rdi),%r8  #第三四个赋值
+        mrmovl  24(%rdi),%r9  #插在两指令之间
+        rmmovl  $r8 ,16(%rsi)  #移去第三个
+        andl    %r9,%r9
+        jnle    Done
+        iaddl   $1 , %rax
+pos3: rmmovl  %r9 , 24(%rsi) #移去第四个
+        andl    %rdx,%rdx
+        jnle    Done
+        iaddl   $1, %rax
+pos4: mrmovl  32(%rdi),%r8  #第五六个赋值
+        mrmovl  40(%rdi),%r9  #插在两指令之间
+        rmmovl  $r8 ,32(%rsi)  #移去第五个
+        andl    %r9,%r9
+        jnle    Done
+        iaddl   $1 , %rax
+pos5: rmmovl  %r9 , 40(%rsi) #移去第六个
+        andl    %rdx,%rdx
+        jnle    Done
+        iaddl   $1, %rax
+pos6: mrmovl  48(%rdi),%r8  #第七八个赋值
+        mrmovl  56(%rdi),%r9  #插在两指令之间
+        rmmovl  $r8 ,48(%rsi)  #移去第七个
+        andl    %r9,%r9
+        jnle    Done
+        iaddl   $1 , %rax
+pos7: rmmovl  %r9 , 56(%rsi) #移去第八个
+        andl    %rdx,%rdx
+        jnle    Done          
+        iaddl   $1, %rax
+nextLoop:
+        iaddl   $rax,%rdi
+        iaddl   $rax,%rsi
+        iaddl   $rax,%rdx
+        jge     Loop       
+///////////////////////////////////////
+//////////////////////////////////////     
+##################################################################
+# Do not modify the following section of code
+# Function epilogue.
+Done:
+	andq %rdx,%rdx		# len <= 0?
+	jle Loop	        # if so, goto Loop:
+	ret
+##################################################################
+# Keep the following label at the end of your function
+End:
+#/* $end ncopy-ys */
